@@ -26,7 +26,7 @@ module tb_alu_control;
             $error("Default case failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
         end
         
-        ALUOp = ALUOP_RTYPE;
+        ALUOp = ALUOP_RTYPE;    // R-type instructions
         funct7 = 7'b0000000;
         funct3 = 3'b000;
         
@@ -35,13 +35,20 @@ module tb_alu_control;
             $error("ADD instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
         end
         
-        ALUOp = ALUOP_RTYPE;
         funct7 = 7'b0100000;
         funct3 = 3'b000;
         
         #10;
         if (ALUctrl !== ALU_SUB) begin
-            $error("SUB instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
+            $error("SUB instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_SUB);
+        end
+        
+        ALUOp = ALUOP_ITYPE;    // I-type instructions
+        funct3 = 3'b000;
+        
+        #10;
+        if (ALUctrl !== ALU_ADD) begin
+            $error("ADDI instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
         end
         
         $display("alu_control testbench finished");

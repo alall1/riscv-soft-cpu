@@ -9,13 +9,15 @@ module tb_cpu_core;
     logic [31:0] debug_pc;
     logic [31:0] debug_instr;
     logic [31:0] debug_alu;
+    logic [31:0] debug_imm;
     
     cpu_core core (
         .clk(clk),
         .reset(reset),
         .debug_pc(debug_pc),
         .debug_instr(debug_instr),
-        .debug_alu(debug_alu)
+        .debug_alu(debug_alu),
+        .debug_imm(debug_imm)
     );
     
     initial begin
@@ -29,6 +31,8 @@ module tb_cpu_core;
         #1;
         core.instr_mem.mem[0] = 32'h002081B3; // 1. add x3, x1, x2
         core.instr_mem.mem[1] = 32'h40208233; // 2. sub x4, x1, x2
+        core.instr_mem.mem[2] = 32'hffe08293; // 3. addi x5, x1, -2
+        
 
         @(posedge clk);     // first posedge clk, reset is high for 1ns before instructions are executed (instr 1)
         #1;
@@ -47,10 +51,19 @@ module tb_cpu_core;
         @(posedge clk);     // third posedge clk, pc_current = 8 (instr 3)
         #1;
 
-        if (core.register_file.registers[3] !== 32'd3) begin
-            $error("SUB failed: x3=%h expected=%h", core.register_file.registers[4], 32'd3);
+        if (core.register_file.registers[4] !== 32'd3) begin
+            $error("SUB failed: x4=%h expected=%h", core.register_file.registers[4], 32'd3);
         end
+        
+        @(posedge clk);     // fourth posedge clk, pc_current = 12 (instr 4)
+        #1;
 
+        if (core.register_file.registers[5] !== 32'd8) begin
+            $error("ADDI failed: x5=%h expected=%h", core.register_file.registers[5], 32'd8);
+        end
+        
+        
+        #9;
         $display("cpu_core testbench finished");
         $finish;
     end

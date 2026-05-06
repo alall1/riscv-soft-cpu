@@ -2,10 +2,12 @@ package cpu_defs_pkg;
 
     // opcodes
     localparam logic [6:0] OPCODE_RTYPE = 7'b0110011;
+    localparam logic [6:0] OPCODE_ITYPE = 7'b0010011;   // I-type (not loads)
 
     typedef enum logic [2:0] { // ALUOp encodings
         ALUOP_ADD    = 3'b000,
-        ALUOP_RTYPE  = 3'b001
+        ALUOP_RTYPE  = 3'b001,
+        ALUOP_ITYPE  = 3'b010
     } alu_op_t;
 
     typedef enum logic [3:0] { // ALUctrl encodings

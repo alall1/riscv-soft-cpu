@@ -19,6 +19,13 @@ module alu_control(
                 endcase
             end
             
+            ALUOP_ITYPE: begin // I-type ops (not loads)
+                case (funct3)
+                    3'b000: ALUctrl = ALU_ADD;
+                    default: ALUctrl = ALU_ADD;
+                endcase
+            end
+            
             default: begin
                 ALUctrl = ALU_ADD;
             end
