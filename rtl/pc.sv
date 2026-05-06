@@ -11,5 +11,5 @@ module pc(
         else
             pc = pc_next;
     end
- 
+
 endmodule

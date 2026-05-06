@@ -17,6 +17,8 @@ module control_unit(
             end
             
             default: begin // default case
+                RegWrite = 1'b0;
+                ALUOp = ALUOP_ADD;
             end
         endcase
     end

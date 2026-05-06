@@ -9,7 +9,7 @@ module instr_memory #(
     
     initial begin
         mem[0] = 32'h00000033; // add x0, x0, x0
-        mem[1] = 32'h00000033; // add x0, x0, x0
+        mem[1] = 32'h00000013; // NOP
         mem[2] = 32'h00000033; // add x0, x0, x0
         mem[3] = 32'h00000033; // add x0, x0, x0
         
@@ -24,5 +24,5 @@ module instr_memory #(
         else
             instr = 32'h00000033; // (NOP) add x0, x0, x0
     end
-        
+    
 endmodule
