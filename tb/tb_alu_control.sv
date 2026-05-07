@@ -43,12 +43,26 @@ module tb_alu_control;
             $error("SUB instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_SUB);
         end
         
-        ALUOp = ALUOP_ITYPE;    // I-type instructions
+        ALUOp = ALUOP_ITYPE;    // I-type instructions (not loads)
         funct3 = 3'b000;
         
         #10;
         if (ALUctrl !== ALU_ADD) begin
             $error("ADDI instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
+        end
+        
+        ALUOp = ALUOP_LOADS;    // I-type loads (always ALU_ADD)
+        
+        #10;
+        if (ALUctrl !== ALU_ADD) begin
+            $error("Load instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
+        end
+        
+        ALUOp = ALUOP_STYPE;    // S-type instructions (always ALU_ADD)
+        
+        #10;
+        if (ALUctrl !== ALU_ADD) begin
+            $error("Store instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
         end
         
         $display("alu_control testbench finished");

@@ -10,6 +10,7 @@ module tb_cpu_core;
     logic [31:0] debug_instr;
     logic [31:0] debug_alu;
     logic [31:0] debug_imm;
+    logic [31:0] debug_writeback;
     
     cpu_core core (
         .clk(clk),
@@ -17,7 +18,8 @@ module tb_cpu_core;
         .debug_pc(debug_pc),
         .debug_instr(debug_instr),
         .debug_alu(debug_alu),
-        .debug_imm(debug_imm)
+        .debug_imm(debug_imm),
+        .debug_writeback(debug_writeback)
     );
     
     initial begin
@@ -32,14 +34,21 @@ module tb_cpu_core;
         core.instr_mem.mem[0] = 32'h002081B3; // 1. add x3, x1, x2
         core.instr_mem.mem[1] = 32'h40208233; // 2. sub x4, x1, x2
         core.instr_mem.mem[2] = 32'hffe08293; // 3. addi x5, x1, -2
+        core.instr_mem.mem[3] = 32'h0002a103; // 4. lw x2 0(x5)     -> loading mem[2] into x2
+        core.instr_mem.mem[4] = 32'h00202223; // 5. sw x2 4(x0)     -> storing x2 into mem[1]
         
 
         @(posedge clk);     // first posedge clk, reset is high for 1ns before instructions are executed (instr 1)
         #1;
         reset = 1'b0;
 
+        // initial setup for registers + memory
         core.register_file.registers[1] = 32'd10;
         core.register_file.registers[2] = 32'd7;
+        
+        core.data_mem.mem[2] = 32'hFFFFFFF8;
+        
+        //////////////// R-TYPE ////////////////
 
         @(posedge clk);     // second posedge clk, pc_current = 4 (instr 2)
         #1;
@@ -57,11 +66,30 @@ module tb_cpu_core;
         
         @(posedge clk);     // fourth posedge clk, pc_current = 12 (instr 4)
         #1;
+        
+        //////////////// I-TYPE ////////////////
 
         if (core.register_file.registers[5] !== 32'd8) begin
             $error("ADDI failed: x5=%h expected=%h", core.register_file.registers[5], 32'd8);
         end
         
+        @(posedge clk);     // fifth posedge clk, pc_current = 16 (instr 5)
+        #1;
+        
+        //////////////// LOADS ////////////////
+        
+        if (core.register_file.registers[2] !== 32'hFFFFFFF8) begin
+            $error("LW failed: x2=%h expected=%h", core.register_file.registers[2], 32'hFFFFFFF8);
+        end
+        
+        @(posedge clk);     // sixth posedge clk, pc_current = 20 (instr 6)
+        #1;
+        
+        //////////////// STORES ////////////////
+        
+        if (core.data_mem.mem[1] !== 32'hFFFFFFF8) begin
+            $error("SW failed: mem[1]=%h expected=%h", core.data_mem.mem[1], 32'hFFFFFFF8);
+        end
         
         #9;
         $display("cpu_core testbench finished");

@@ -21,9 +21,17 @@ module tb_imm_generator;
         #10;
         if (imm !== 32'h00000005) $error("I-type error. imm=%h expected=%h", imm, 32'h00000005);
         
-        instr = 32'hffe00013;   // addi x0, x0, 5 -> imm = -2
+        instr = 32'hFFE00013;   // addi x0, x0, 5 -> imm = -2
         #10;
         if (imm !== 32'hFFFFFFFE) $error("I-type error. imm=%h expected=%h", imm, 32'hFFFFFFFE);
+        
+        instr = 32'hFF802003;   // lw x0, -8(x0) -> imm = -8
+        #10;
+        if (imm !== 32'hFFFFFFF8) $error("Load instr error. imm=%h expected=%h", imm, 32'hFFFFFFF8);
+        
+        instr = 32'hFE002823;   // sw x0, -16(x0) -> imm = -16
+        #10;
+        if (imm !== 32'hFFFFFFF0) $error("Store instr error. imm=%h expected=%h", imm, 32'hFFFFFFF0);
         
         $display("imm_generator testbench finished");
         $finish;

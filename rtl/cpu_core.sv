@@ -7,25 +7,32 @@ module cpu_core(
     output logic [31:0] debug_pc,
     output logic [31:0] debug_instr,
     output logic [31:0] debug_alu,
-    output logic [31:0] debug_imm
+    output logic [31:0] debug_imm,
+    output logic [31:0] debug_writeback
 );
 
     logic [31:0] pc_current, pc_next;   // current pc and next pc
     logic [31:0] instr;                 // current instruction
     logic [31:0] rs1, rs2;              // data read from reg_file
     logic [31:0] alu_result;            // result from ALU
+    logic [31:0] data_result;           // result from data_mem (for load instructions)
+    logic [31:0] write_result;          // result to write to reg_file (through writeback mux)
     logic [31:0] imm;                   // generated immediate from imm_generator
-    logic [31:0] alu_src_input;            // selected input_2 into ALU (imm or rs2)
+    logic [31:0] alu_src_input;         // selected input_2 into ALU (imm or rs2)
     
     assign debug_pc = pc_current;
     assign debug_instr = instr;
     assign debug_alu = alu_result;
     assign debug_imm = imm;
+    assign debug_writeback = write_result;
     
     
     // control signals
     logic RegWrite;
     logic ALUSrc;
+    logic MemRead;
+    logic MemWrite;
+    logic MemtoReg;
     alu_op_t ALUOp;              
     alu_ctrl_t ALUctrl;
     
@@ -55,6 +62,9 @@ module cpu_core(
         .opcode(instr[6:0]),
         .RegWrite(RegWrite),
         .ALUSrc(ALUSrc),
+        .MemRead(MemRead),
+        .MemWrite(MemWrite),
+        .MemtoReg(MemtoReg),
         .ALUOp(ALUOp)
     );
     
@@ -74,7 +84,7 @@ module cpu_core(
         .rs1_addr(instr[19:15]),
         .rs2_addr(instr[24:20]),
         .rd_addr(instr[11:7]),
-        .write_data(alu_result),
+        .write_data(write_result),
         .rs1_data(rs1),
         .rs2_data(rs2)
     );
@@ -92,12 +102,31 @@ module cpu_core(
         .sel(ALUSrc),
         .result(alu_src_input)
     );
-
+    
+    // ALU
     alu alu_unit (
         .ALUctrl(ALUctrl),
         .input_1(rs1),
         .input_2(alu_src_input),
         .result(alu_result)
+    );
+    
+    // data memory
+    data_memory data_mem (
+        .clk(clk),
+        .MemRead(MemRead),
+        .MemWrite(MemWrite),
+        .addr(alu_result),
+        .write_data(rs2),
+        .read_data(data_result)
+    );
+    
+    // writeback mux -> reg_file.write_data
+    mux32 writeback_mux (
+        .A(alu_result),
+        .B(data_result),
+        .sel(MemtoReg),
+        .result(write_result)
     );
     
 endmodule

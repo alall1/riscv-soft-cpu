@@ -3,14 +3,18 @@ package cpu_defs_pkg;
     // opcodes
     localparam logic [6:0] OPCODE_RTYPE = 7'b0110011;
     localparam logic [6:0] OPCODE_ITYPE = 7'b0010011;   // I-type (not loads)
+    localparam logic [6:0] OPCODE_LOADS = 7'b0000011;   // I-type (loads)
+    localparam logic [6:0] OPCODE_STYPE = 7'b0100011;
 
-    typedef enum logic [2:0] { // ALUOp encodings
+    typedef enum logic [2:0] {  // ALUOp encodings
         ALUOP_ADD    = 3'b000,
         ALUOP_RTYPE  = 3'b001,
-        ALUOP_ITYPE  = 3'b010
+        ALUOP_ITYPE  = 3'b010,
+        ALUOP_LOADS  = 3'b011,
+        ALUOP_STYPE  = 3'b100
     } alu_op_t;
 
-    typedef enum logic [3:0] { // ALUctrl encodings
+    typedef enum logic [3:0] {  // ALUctrl encodings
         ALU_ADD    = 4'b0000,
         ALU_SUB    = 4'b0001,
         ALU_AND    = 4'b0010,

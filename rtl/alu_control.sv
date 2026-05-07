@@ -11,7 +11,7 @@ module alu_control(
         ALUctrl = ALU_ADD;
         
         case (ALUOp)
-            ALUOP_RTYPE: begin // R-type ops
+            ALUOP_RTYPE: begin  // R-type ops
                 case ({funct7, funct3})
                     {7'b0000000, 3'b000}: ALUctrl = ALU_ADD;
                     {7'b0100000, 3'b000}: ALUctrl = ALU_SUB;
@@ -19,11 +19,16 @@ module alu_control(
                 endcase
             end
             
-            ALUOP_ITYPE: begin // I-type ops (not loads)
+            ALUOP_ITYPE: begin  // I-type ops (not loads)
                 case (funct3)
                     3'b000: ALUctrl = ALU_ADD;
                     default: ALUctrl = ALU_ADD;
                 endcase
+            end
+            
+            ALUOP_LOADS,        // I-type load ops
+            ALUOP_STYPE: begin  // S-type ops
+                ALUctrl = ALU_ADD;
             end
             
             default: begin

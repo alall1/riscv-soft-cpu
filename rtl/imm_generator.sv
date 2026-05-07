@@ -7,8 +7,13 @@ module imm_generator(
 
     always_comb begin
         case (instr[6:0])
-            OPCODE_ITYPE: begin
+            OPCODE_ITYPE,
+            OPCODE_LOADS: begin
                 imm = {{20{instr[31]}}, instr[31:20]};
+            end
+            
+            OPCODE_STYPE: begin
+                imm = {{20{instr[31]}}, instr[31:25], instr[11:7]};
             end
             
             default: begin
