@@ -31,6 +31,18 @@ module alu_control(
                 ALUctrl = ALU_ADD;
             end
             
+            ALUOP_BTYPE: begin  // B-type ops
+                case (funct3)
+                    3'b000: ALUctrl = ALU_BEQ;
+                    3'b001: ALUctrl = ALU_BNE;
+                    3'b100: ALUctrl = ALU_BLT;
+                    3'b101: ALUctrl = ALU_BGE;
+                    3'b110: ALUctrl = ALU_BLTU;
+                    3'b111: ALUctrl = ALU_BGEU;
+                    default: ALUctrl = ALU_BEQ;
+                endcase
+            end
+            
             default: begin
                 ALUctrl = ALU_ADD;
             end

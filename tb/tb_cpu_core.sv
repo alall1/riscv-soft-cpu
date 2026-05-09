@@ -91,6 +91,10 @@ module tb_cpu_core;
             $error("SW failed: mem[1]=%h expected=%h", core.data_mem.mem[1], 32'hFFFFFFF8);
         end
         
+        //////////////// BRANCHES ////////////////
+        
+        
+        
         #9;
         $display("cpu_core testbench finished");
         $finish;

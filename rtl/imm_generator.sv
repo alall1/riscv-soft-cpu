@@ -16,6 +16,10 @@ module imm_generator(
                 imm = {{20{instr[31]}}, instr[31:25], instr[11:7]};
             end
             
+            OPCODE_BTYPE: begin
+                imm = {{19{instr[31]}}, instr[31], instr[7], instr[30:25], instr[11:8], 1'b0};
+            end
+            
             default: begin
                 imm = 32'h00000000;
             end

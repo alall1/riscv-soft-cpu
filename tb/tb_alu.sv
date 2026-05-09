@@ -8,12 +8,14 @@ module tb_alu;
     logic [31:0] input_1;
     logic [31:0] input_2;
     logic [31:0] result;
+    logic branch_cond;
     
     alu dut (
         .ALUctrl(ALUctrl),
         .input_1(input_1),
         .input_2(input_2),
-        .result(result)
+        .result(result),
+        .branch_cond(branch_cond)
     );
     
     initial begin
@@ -76,6 +78,32 @@ module tb_alu;
         ALUctrl = ALU_SLTU;
         #10;
         if (result !== 32'h00000000) $error("SLTU op error. result=%h expected=%h", result, 32'h00000000);
+        
+        ALUctrl = ALU_BEQ;
+        input_1 = 32'hFFFFFFFE;     // signed: -2
+        input_2 = 32'h00000001;
+        #10;
+        if (branch_cond !== 1'b0) $error("BEQ op error. branch_cond=%b expected=%b", branch_cond, 1'b0);
+        
+        ALUctrl = ALU_BNE;
+        #10;
+        if (branch_cond !== 1'b1) $error("BNE op error. branch_cond=%b expected=%b", branch_cond, 1'b1);
+        
+        ALUctrl = ALU_BLT;
+        #10;
+        if (branch_cond !== 1'b1) $error("BLT op error. branch_cond=%b expected=%b", branch_cond, 1'b1);
+        
+        ALUctrl = ALU_BGE;
+        #10;
+        if (branch_cond !== 1'b0) $error("BGE op error. branch_cond=%b expected=%b", branch_cond, 1'b0);
+        
+        ALUctrl = ALU_BLTU;
+        #10;
+        if (branch_cond !== 1'b0) $error("BLTU op error. branch_cond=%b expected=%b", branch_cond, 1'b0);
+        
+        ALUctrl = ALU_BGEU;
+        #10;
+        if (branch_cond !== 1'b1) $error("BGEU op error. branch_cond=%b expected=%b", branch_cond, 1'b1);
         
         $display("alu testbench finished");
         $finish;

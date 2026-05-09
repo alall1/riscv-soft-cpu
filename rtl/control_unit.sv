@@ -7,6 +7,7 @@ module control_unit(
     output logic MemRead,
     output logic MemWrite,
     output logic MemtoReg,
+    output logic Branch,
     output alu_op_t ALUOp
 );
 
@@ -15,13 +16,14 @@ module control_unit(
         ALUSrc = 1'b0;
         ALUOp = ALUOP_ADD;
         
-        case (opcode)
+        unique case (opcode)
             OPCODE_RTYPE: begin     // R-type instructions
                 RegWrite = 1'b1;
                 ALUSrc = 1'b0;
                 MemRead = 1'b0;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
+                Branch = 1'b0;
                 ALUOp = ALUOP_RTYPE;
             end
             
@@ -31,6 +33,7 @@ module control_unit(
                 MemRead = 1'b0; 
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
+                Branch = 1'b0;
                 ALUOp = ALUOP_ITYPE;
             end
             
@@ -40,6 +43,7 @@ module control_unit(
                 MemRead = 1'b1;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b1;
+                Branch = 1'b0;
                 ALUOp = ALUOP_LOADS;
             end
             
@@ -49,15 +53,27 @@ module control_unit(
                 MemRead = 1'b0;
                 MemWrite = 1'b1;
                 MemtoReg = 1'b0;
+                Branch = 1'b0;
                 ALUOp = ALUOP_STYPE;
             end
             
-            default: begin          // default case
+            OPCODE_BTYPE: begin     // B-type instructions
                 RegWrite = 1'b0;
                 ALUSrc = 1'b0;
                 MemRead = 1'b0;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
+                Branch = 1'b1;
+                ALUOp = ALUOP_BTYPE;
+            end
+            
+            default: begin          // default case (invalid opcode)
+                RegWrite = 1'b0;
+                ALUSrc = 1'b0;
+                MemRead = 1'b0;
+                MemWrite = 1'b0;
+                MemtoReg = 1'b0;
+                Branch = 1'b0;
                 ALUOp = ALUOP_ADD;
             end
         endcase

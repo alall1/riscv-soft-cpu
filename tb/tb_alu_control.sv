@@ -65,6 +65,49 @@ module tb_alu_control;
             $error("Store instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
         end
         
+        ALUOp = ALUOP_BTYPE;    // B-type instructions
+        funct3 = 3'b000;
+        
+        #10;
+        if (ALUctrl !== ALU_BEQ) begin
+            $error("BEQ instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_BEQ);
+        end
+        
+        funct3 = 3'b001;
+        
+        #10;
+        if (ALUctrl !== ALU_BNE) begin
+            $error("BNE instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_BNE);
+        end
+        
+        funct3 = 3'b100;
+        
+        #10;
+        if (ALUctrl !== ALU_BLT) begin
+            $error("BLT instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_BLT);
+        end
+        
+        funct3 = 3'b101;
+        
+        #10;
+        if (ALUctrl !== ALU_BGE) begin
+            $error("BGE instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_BGE);
+        end
+        
+        funct3 = 3'b110;
+        
+        #10;
+        if (ALUctrl !== ALU_BLTU) begin
+            $error("BLTU instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_BLTU);
+        end
+        
+        funct3 = 3'b111;
+        
+        #10;
+        if (ALUctrl !== ALU_BGEU) begin
+            $error("BGEU instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_BGEU);
+        end
+        
         $display("alu_control testbench finished");
         $finish;
     end

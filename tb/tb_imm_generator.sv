@@ -33,6 +33,11 @@ module tb_imm_generator;
         #10;
         if (imm !== 32'hFFFFFFF0) $error("Store instr error. imm=%h expected=%h", imm, 32'hFFFFFFF0);
         
+        instr = 32'h00001463;   // bne x0, x0, 8 -> imm = 8
+        #10;
+        if (imm !== 32'h00000008) $error("B-type error. imm=%h expected=%h", imm, 32'h00000008);
+       
+        
         $display("imm_generator testbench finished");
         $finish;
     end

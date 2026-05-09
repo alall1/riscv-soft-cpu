@@ -4,27 +4,31 @@ module cpu_core(
     input logic clk,
     input logic reset,
     
-    output logic [31:0] debug_pc,
     output logic [31:0] debug_instr,
     output logic [31:0] debug_alu,
     output logic [31:0] debug_imm,
-    output logic [31:0] debug_writeback
+    output logic [31:0] debug_writeback,
+    output logic [31:0] debug_pc_curr,
+    output logic [31:0] debug_pc_next
 );
 
-    logic [31:0] pc_current, pc_next;   // current pc and next pc
-    logic [31:0] instr;                 // current instruction
-    logic [31:0] rs1, rs2;              // data read from reg_file
-    logic [31:0] alu_result;            // result from ALU
-    logic [31:0] data_result;           // result from data_mem (for load instructions)
-    logic [31:0] write_result;          // result to write to reg_file (through writeback mux)
-    logic [31:0] imm;                   // generated immediate from imm_generator
-    logic [31:0] alu_src_input;         // selected input_2 into ALU (imm or rs2)
+    logic [31:0] pc_current, pc_next;       // current pc and next pc
+    logic [31:0] pc_plus_4, pc_plus_imm;    // pc+4 and pc+imm
+    logic [31:0] instr;                     // current instruction
+    logic [31:0] rs1, rs2;                  // data read from reg_file
+    logic [31:0] data_result;               // result from data_mem (for load instructions)
+    logic [31:0] write_result;              // result to write to reg_file (through writeback mux)
+    logic [31:0] imm;                       // generated immediate from imm_generator
+    logic [31:0] alu_src_input;             // selected input_2 into ALU (imm or rs2)
+    logic [31:0] alu_result;                // result from ALU
+    logic branch_cond;                      // branch_cond result from ALU
     
-    assign debug_pc = pc_current;
     assign debug_instr = instr;
     assign debug_alu = alu_result;
     assign debug_imm = imm;
     assign debug_writeback = write_result;
+    assign debug_pc_curr = pc_current;
+    assign debug_pc_next = pc_next;
     
     
     // control signals
@@ -33,6 +37,7 @@ module cpu_core(
     logic MemRead;
     logic MemWrite;
     logic MemtoReg;
+    logic Branch;
     alu_op_t ALUOp;              
     alu_ctrl_t ALUctrl;
     
@@ -45,10 +50,26 @@ module cpu_core(
     );
     
     // PC = PC + 4 adder
-    adder pc_adder (
+    adder pc_increment (
         .A(pc_current),
         .B(32'h00000004),
-        .S(pc_next)
+        .S(pc_plus_4)
+    );
+    
+    // PC = PC + imm adder
+    adder pc_branch (
+        .A(pc_current),
+        .B(imm),
+        .S(pc_plus_imm)
+    );
+    
+    // PC_next logic
+    pc_next_logic pc_logic (
+        .pc_plus_4(pc_plus_4),
+        .pc_plus_imm(pc_plus_imm),
+        .Branch(Branch),
+        .branch_cond(branch_cond),
+        .pc_next(pc_next)
     );
     
     // instruction memory
@@ -65,6 +86,7 @@ module cpu_core(
         .MemRead(MemRead),
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
+        .Branch(Branch),
         .ALUOp(ALUOp)
     );
     
@@ -108,7 +130,8 @@ module cpu_core(
         .ALUctrl(ALUctrl),
         .input_1(rs1),
         .input_2(alu_src_input),
-        .result(alu_result)
+        .result(alu_result),
+        .branch_cond(branch_cond)
     );
     
     // data memory
