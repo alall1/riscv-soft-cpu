@@ -6,20 +6,22 @@ module tb_cpu_core;
 
     logic clk;
     logic reset;
-    logic [31:0] debug_pc;
     logic [31:0] debug_instr;
     logic [31:0] debug_alu;
     logic [31:0] debug_imm;
     logic [31:0] debug_writeback;
-    
+    logic [31:0] debug_pc_curr;
+    logic [31:0] debug_pc_next;
+
     cpu_core core (
         .clk(clk),
         .reset(reset),
-        .debug_pc(debug_pc),
         .debug_instr(debug_instr),
         .debug_alu(debug_alu),
         .debug_imm(debug_imm),
-        .debug_writeback(debug_writeback)
+        .debug_writeback(debug_writeback),
+        .debug_pc_curr(debug_pc_curr),
+        .debug_pc_next(debug_pc_next)
     );
     
     initial begin
@@ -36,6 +38,9 @@ module tb_cpu_core;
         core.instr_mem.mem[2] = 32'hffe08293; // 3. addi x5, x1, -2
         core.instr_mem.mem[3] = 32'h0002a103; // 4. lw x2 0(x5)     -> loading mem[2] into x2
         core.instr_mem.mem[4] = 32'h00202223; // 5. sw x2 4(x0)     -> storing x2 into mem[1]
+        core.instr_mem.mem[5] = 32'h0041da63; // 6. bge x3, x4, 20  -> branch to pc + 20 = 40
+        // xxx
+        core.instr_mem.mem[10] = 32'h00100313; // 11. addi x6, x0, 1;
         
 
         @(posedge clk);     // first posedge clk, reset is high for 1ns before instructions are executed (instr 1)
@@ -82,7 +87,7 @@ module tb_cpu_core;
             $error("LW failed: x2=%h expected=%h", core.register_file.registers[2], 32'hFFFFFFF8);
         end
         
-        @(posedge clk);     // sixth posedge clk, pc_current = 20 (instr 6)
+        @(posedge clk);     // sixth posedge clk, pc_current = 20 (instr 6) --> branch to 40
         #1;
         
         //////////////// STORES ////////////////
@@ -91,9 +96,21 @@ module tb_cpu_core;
             $error("SW failed: mem[1]=%h expected=%h", core.data_mem.mem[1], 32'hFFFFFFF8);
         end
         
+        @(posedge clk);     // seventh posedge clk, pc_current = 40 (instr 11)
+        #1;
+        
         //////////////// BRANCHES ////////////////
         
+        if (core.pc_current !== 32'h00000028) begin
+            $error("BGE failed: pc_curr=%h expected=%h", core.pc_current, 32'h00000028);
+        end
         
+        @(posedge clk);     // seventh posedge clk, pc_current = 40 (instr 11)
+        #1;
+        
+        if (core.register_file.registers[6] !== 32'h00000001) begin
+            $error("BGE->ADDI failed: x6=%h expected=%h", core.register_file.registers[6], 32'h00000001);
+        end
         
         #9;
         $display("cpu_core testbench finished");
