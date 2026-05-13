@@ -37,6 +37,13 @@ module tb_imm_generator;
         #10;
         if (imm !== 32'h00000008) $error("B-type error. imm=%h expected=%h", imm, 32'h00000008);
        
+        instr = 32'h0180006f;   // jal x0, 24 -> imm = 24
+        #10;
+        if (imm !== 32'h00000018) $error("JAL error. imm=%h expected=%h", imm, 32'h00000018);
+        
+        instr = 32'h01800067;   // jalr x0, 24(x0) -> imm = 24
+        #10;
+        if (imm !== 32'h00000018) $error("JALR error. imm=%h expected=%h", imm, 32'h00000018);
         
         $display("imm_generator testbench finished");
         $finish;

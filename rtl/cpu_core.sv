@@ -17,7 +17,8 @@ module cpu_core(
     logic [31:0] instr;                     // current instruction
     logic [31:0] rs1, rs2;                  // data read from reg_file
     logic [31:0] data_result;               // result from data_mem (for load instructions)
-    logic [31:0] write_result;              // result to write to reg_file (through writeback mux)
+    logic [31:0] memtoreg_result;           // result from memtoreg mux
+    logic [31:0] write_result;              // result to write to reg_file (through jumpwrite mux)
     logic [31:0] imm;                       // generated immediate from imm_generator
     logic [31:0] alu_src_input;             // selected input_2 into ALU (imm or rs2)
     logic [31:0] alu_result;                // result from ALU
@@ -38,7 +39,10 @@ module cpu_core(
     logic MemWrite;
     logic MemtoReg;
     logic Branch;
-    alu_op_t ALUOp;              
+    logic JAL;
+    logic JALR;
+    logic JumpWrite;
+    alu_op_t ALUOp;
     alu_ctrl_t ALUctrl;
     
     // program counter
@@ -69,6 +73,9 @@ module cpu_core(
         .pc_plus_imm(pc_plus_imm),
         .Branch(Branch),
         .branch_cond(branch_cond),
+        .JAL(JAL),
+        .JALR(JALR),
+        .alu_result(alu_result),
         .pc_next(pc_next)
     );
     
@@ -87,6 +94,9 @@ module cpu_core(
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
         .Branch(Branch),
+        .JAL(JAL),
+        .JALR(JALR),
+        .JumpWrite(JumpWrite),
         .ALUOp(ALUOp)
     );
     
@@ -144,11 +154,19 @@ module cpu_core(
         .read_data(data_result)
     );
     
-    // writeback mux -> reg_file.write_data
-    mux32 writeback_mux (
+    // memtoreg mux -> jumpwrite mux input
+    mux32 memtoreg_mux (
         .A(alu_result),
         .B(data_result),
         .sel(MemtoReg),
+        .result(memtoreg_result)
+    );
+    
+    // jumpwrite mux -> reg_file.write_data
+    mux32 jumpwrite_mux (
+        .A(memtoreg_result),
+        .B(pc_plus_4),
+        .sel(JumpWrite),
         .result(write_result)
     );
     

@@ -6,6 +6,8 @@ package cpu_defs_pkg;
     localparam logic [6:0] OPCODE_LOADS = 7'b0000011;   // I-type (loads)
     localparam logic [6:0] OPCODE_STYPE = 7'b0100011;
     localparam logic [6:0] OPCODE_BTYPE = 7'b1100011;
+    localparam logic [6:0] OPCODE_JAL = 7'b1101111;
+    localparam logic [6:0] OPCODE_JALR = 7'b1100111;
 
     typedef enum logic [2:0] {  // ALUOp encodings
         ALUOP_ADD    = 3'b000,
@@ -13,7 +15,8 @@ package cpu_defs_pkg;
         ALUOP_ITYPE  = 3'b010,
         ALUOP_LOADS  = 3'b011,
         ALUOP_STYPE  = 3'b100,
-        ALUOP_BTYPE  = 3'b101
+        ALUOP_BTYPE  = 3'b101,
+        ALUOP_JALR   = 3'b110
     } alu_op_t;
 
     typedef enum logic [3:0] {  // ALUctrl encodings

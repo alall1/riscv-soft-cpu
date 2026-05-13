@@ -8,6 +8,9 @@ module control_unit(
     output logic MemWrite,
     output logic MemtoReg,
     output logic Branch,
+    output logic JAL,
+    output logic JALR,
+    output logic JumpWrite, // JumpWrite controls mux to select for writing PC + 4 to rd
     output alu_op_t ALUOp
 );
 
@@ -24,6 +27,9 @@ module control_unit(
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
                 Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
                 ALUOp = ALUOP_RTYPE;
             end
             
@@ -34,6 +40,9 @@ module control_unit(
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
                 Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
                 ALUOp = ALUOP_ITYPE;
             end
             
@@ -44,6 +53,9 @@ module control_unit(
                 MemWrite = 1'b0;
                 MemtoReg = 1'b1;
                 Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
                 ALUOp = ALUOP_LOADS;
             end
             
@@ -54,6 +66,9 @@ module control_unit(
                 MemWrite = 1'b1;
                 MemtoReg = 1'b0;
                 Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
                 ALUOp = ALUOP_STYPE;
             end
             
@@ -64,7 +79,36 @@ module control_unit(
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
                 Branch = 1'b1;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
                 ALUOp = ALUOP_BTYPE;
+            end
+            
+            OPCODE_JAL: begin     // B-type instructions
+                RegWrite = 1'b1;
+                ALUSrc = 1'b0;
+                MemRead = 1'b0;
+                MemWrite = 1'b0;
+                MemtoReg = 1'b0;
+                Branch = 1'b0;
+                JAL = 1'b1;
+                JALR = 1'b0;
+                JumpWrite = 1'b1;
+                ALUOp = ALUOP_ADD;
+            end
+            
+            OPCODE_JALR: begin     // B-type instructions
+                RegWrite = 1'b1;
+                ALUSrc = 1'b1;
+                MemRead = 1'b0;
+                MemWrite = 1'b0;
+                MemtoReg = 1'b0;
+                Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b1;
+                JumpWrite = 1'b1;
+                ALUOp = ALUOP_JALR;
             end
             
             default: begin          // default case (invalid opcode)
@@ -74,6 +118,9 @@ module control_unit(
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
                 Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
                 ALUOp = ALUOP_ADD;
             end
         endcase

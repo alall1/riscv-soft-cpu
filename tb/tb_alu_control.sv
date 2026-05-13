@@ -108,6 +108,13 @@ module tb_alu_control;
             $error("BGEU instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_BGEU);
         end
         
+        ALUOp = ALUOP_JALR;
+        
+        #10;
+        if (ALUctrl !== ALU_ADD) begin
+            $error("JALR instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
+        end
+        
         $display("alu_control testbench finished");
         $finish;
     end

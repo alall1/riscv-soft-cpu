@@ -39,8 +39,12 @@ module tb_cpu_core;
         core.instr_mem.mem[3] = 32'h0002a103; // 4. lw x2 0(x5)     -> loading mem[2] into x2
         core.instr_mem.mem[4] = 32'h00202223; // 5. sw x2 4(x0)     -> storing x2 into mem[1]
         core.instr_mem.mem[5] = 32'h0041da63; // 6. bge x3, x4, 20  -> branch to pc + 20 = 40
+        core.instr_mem.mem[6] = 32'h00500113; // 7. addi x2, x0, 5
+        core.instr_mem.mem[7] = 32'h00008067; // 8. jalr x0, 0(x1)  -> return to pc = 48
         // xxx
         core.instr_mem.mem[10] = 32'h00100313; // 11. addi x6, x0, 1;
+        core.instr_mem.mem[11] = 32'hfedff0ef; // 12. jal x1, 16;   -> branch to pc - 20 = 24
+        core.instr_mem.mem[12] = 32'h00510113; // 13. addi x2, x2, 5
         
 
         @(posedge clk);     // first posedge clk, reset is high for 1ns before instructions are executed (instr 1)
@@ -105,11 +109,39 @@ module tb_cpu_core;
             $error("BGE failed: pc_curr=%h expected=%h", core.pc_current, 32'h00000028);
         end
         
-        @(posedge clk);     // seventh posedge clk, pc_current = 40 (instr 11)
+        @(posedge clk);     // eighth posedge clk, pc_current = 44 (instr 12)
         #1;
         
         if (core.register_file.registers[6] !== 32'h00000001) begin
             $error("BGE->ADDI failed: x6=%h expected=%h", core.register_file.registers[6], 32'h00000001);
+        end
+        
+        @(posedge clk);     // ninth posedge clk, pc_current = 24 (instr 7)
+        #1;
+        
+        if (core.register_file.registers[1] !== 32'h00000030) begin
+            $error("JAL failed: x1=%h expected=%h", core.register_file.registers[1], 32'h00000030);
+        end
+        
+        @(posedge clk);     // tenth posedge clk, pc_current = 28 (instr 8)
+        #1;
+        
+        if (core.register_file.registers[1] !== 32'h00000030) begin
+            $error("JAL failed: x1=%h expected=%h", core.register_file.registers[1], 32'h00000030);
+        end
+        
+        @(posedge clk);     // eleventh posedge clk, pc_current = 48 (instr 13)
+        #1;
+        
+        if (core.register_file.registers[2] !== 32'h00000005) begin
+            $error("JAL->ADDI failed: x2=%h expected=%h", core.register_file.registers[2], 32'h00000005);
+        end
+        
+        @(posedge clk);     // eleventh posedge clk, pc_current = 48 (instr 13)
+        #1;
+        
+        if (core.register_file.registers[2] !== 32'h0000000A) begin
+            $error("JALR->ADDI failed: x2=%h expected=%h", core.register_file.registers[2], 32'h0000000A);
         end
         
         #9;

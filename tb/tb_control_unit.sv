@@ -11,6 +11,9 @@ module tb_control_unit;
     logic MemWrite;
     logic MemtoReg;
     logic Branch;
+    logic JAL;
+    logic JALR;
+    logic JumpWrite;
     alu_op_t ALUOp;
     
     control_unit dut (
@@ -21,6 +24,9 @@ module tb_control_unit;
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
         .Branch(Branch),
+        .JAL(JAL),
+        .JALR(JALR),
+        .JumpWrite(JumpWrite),
         .ALUOp(ALUOp)
     );
     
@@ -90,6 +96,32 @@ module tb_control_unit;
         if (MemtoReg !== 0) $error("B-Type MemtoReg=%b expected=%b", MemtoReg, 1'b0);
         if (Branch !== 1) $error("B-Type Branch=%b expected=%b", Branch, 1'b1);
         if (ALUOp !== ALUOP_BTYPE) $error("B-Type ALUOp=%b expected=%b", ALUOp, ALUOP_BTYPE);
+        
+        opcode = OPCODE_JAL;  // JAL opcode
+        
+        #10;
+        if (RegWrite !== 1) $error("JAL RegWrite=%b expected=%b", RegWrite, 1'b1);
+        if (ALUSrc !== 0) $error("JAL ALUSrc=%b expected=%b", ALUSrc, 1'b0);
+        if (MemRead !== 0) $error("JAL MemRead=%b expected=%b", MemRead, 1'b0);
+        if (MemWrite !== 0) $error("JAL MemWrite=%b expected=%b", MemWrite, 1'b0);
+        if (MemtoReg !== 0) $error("JAL MemtoReg=%b expected=%b", MemtoReg, 1'b0);
+        if (Branch !== 0) $error("JAL Branch=%b expected=%b", Branch, 1'b0);
+        if (JAL !== 1) $error("JAL JAL=%b expected=%b", JAL, 1'b1);
+        if (JumpWrite !== 1) $error("JAL JumpWrite=%b expected=%b", JumpWrite, 1'b1);
+        if (ALUOp !== ALUOP_ADD) $error("JAL ALUOp=%b expected=%b", ALUOp, ALUOP_ADD);
+        
+        opcode = OPCODE_JALR;  // JALR opcode
+        
+        #10;
+        if (RegWrite !== 1) $error("JALR RegWrite=%b expected=%b", RegWrite, 1'b1);
+        if (ALUSrc !== 1) $error("JALR ALUSrc=%b expected=%b", ALUSrc, 1'b1);
+        if (MemRead !== 0) $error("JALR MemRead=%b expected=%b", MemRead, 1'b0);
+        if (MemWrite !== 0) $error("JALR MemWrite=%b expected=%b", MemWrite, 1'b0);
+        if (MemtoReg !== 0) $error("JALR MemtoReg=%b expected=%b", MemtoReg, 1'b0);
+        if (Branch !== 0) $error("JALR Branch=%b expected=%b", Branch, 1'b0);
+        if (JALR !== 1) $error("JALR Jump=%b expected=%b", JALR, 1'b1);
+        if (JumpWrite !== 1) $error("JARL JumpWrite=%b expected=%b", JumpWrite, 1'b1);
+        if (ALUOp !== ALUOP_JALR) $error("JALR ALUOp=%b expected=%b", ALUOp, ALUOP_JALR);
         
         $display("control_unit testbench finished");
         $finish;
