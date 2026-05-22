@@ -115,6 +115,13 @@ module tb_alu_control;
             $error("JALR instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_ADD);
         end
         
+        ALUOp = ALUOP_LUI;
+        
+        #10;
+        if (ALUctrl !== ALU_LUI) begin
+            $error("LUI instruction failed. ALUctrl=%b expected=%b", ALUctrl, ALU_LUI);
+        end
+        
         $display("alu_control testbench finished");
         $finish;
     end

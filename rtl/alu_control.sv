@@ -43,8 +43,12 @@ module alu_control(
                 endcase
             end
             
-            ALUOP_JALR: begin  // JALR
+            ALUOP_JALR: begin   // JALR
                 ALUctrl = ALU_ADD;
+            end
+            
+            ALUOP_LUI: begin    // LUI (result = imm)
+                ALUctrl = ALU_LUI;
             end
             
             default: begin

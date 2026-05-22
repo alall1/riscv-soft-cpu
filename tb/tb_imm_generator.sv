@@ -45,6 +45,14 @@ module tb_imm_generator;
         #10;
         if (imm !== 32'h00000018) $error("JALR error. imm=%h expected=%h", imm, 32'h00000018);
         
+        instr = 32'h12345037;   // lui x0, 74565
+        #10;
+        if (imm !== 32'h12345000) $error("LUI error. imm=%h expected=%h", imm, 32'h12345000);
+        
+        instr = 32'h12345017;   // auipc x0, 74565
+        #10;
+        if (imm !== 32'h12345000) $error("AUIPC error. imm=%h expected=%h", imm, 32'h12345000);
+        
         $display("imm_generator testbench finished");
         $finish;
     end

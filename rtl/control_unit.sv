@@ -3,7 +3,8 @@ import cpu_defs_pkg::*;
 module control_unit(
     input logic [6:0] opcode,
     output logic RegWrite,
-    output logic ALUSrc,
+    output logic ALUSrcA,   // ALUSrcA is for mux to choose between rs2 and imm
+    output logic ALUSrcB,   // ALUSrcB is for mux to choose between rs1 and PC (specifically for AUIPC)
     output logic MemRead,
     output logic MemWrite,
     output logic MemtoReg,
@@ -15,14 +16,11 @@ module control_unit(
 );
 
     always_comb begin
-        RegWrite = 1'b0;
-        ALUSrc = 1'b0;
-        ALUOp = ALUOP_ADD;
-        
         unique case (opcode)
             OPCODE_RTYPE: begin     // R-type instructions
                 RegWrite = 1'b1;
-                ALUSrc = 1'b0;
+                ALUSrcA = 1'b0;
+                ALUSrcB = 1'b0;
                 MemRead = 1'b0;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
@@ -35,7 +33,8 @@ module control_unit(
             
             OPCODE_ITYPE: begin     // I-type instructions (not loads)
                 RegWrite = 1'b1;
-                ALUSrc = 1'b1;
+                ALUSrcA = 1'b1;
+                ALUSrcB = 1'b0;
                 MemRead = 1'b0; 
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
@@ -48,7 +47,8 @@ module control_unit(
             
             OPCODE_LOADS: begin     // I-type instructions (loads)
                 RegWrite = 1'b1;
-                ALUSrc = 1'b1;
+                ALUSrcA = 1'b1;
+                ALUSrcB = 1'b0;
                 MemRead = 1'b1;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b1;
@@ -61,7 +61,8 @@ module control_unit(
             
             OPCODE_STYPE: begin     // S-type instructions
                 RegWrite = 1'b0;
-                ALUSrc = 1'b1;
+                ALUSrcA = 1'b1;
+                ALUSrcB = 1'b0;
                 MemRead = 1'b0;
                 MemWrite = 1'b1;
                 MemtoReg = 1'b0;
@@ -74,7 +75,8 @@ module control_unit(
             
             OPCODE_BTYPE: begin     // B-type instructions
                 RegWrite = 1'b0;
-                ALUSrc = 1'b0;
+                ALUSrcA = 1'b0;
+                ALUSrcB = 1'b0;
                 MemRead = 1'b0;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
@@ -87,7 +89,8 @@ module control_unit(
             
             OPCODE_JAL: begin     // B-type instructions
                 RegWrite = 1'b1;
-                ALUSrc = 1'b0;
+                ALUSrcA = 1'b0;
+                ALUSrcB = 1'b0;
                 MemRead = 1'b0;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
@@ -100,7 +103,8 @@ module control_unit(
             
             OPCODE_JALR: begin     // B-type instructions
                 RegWrite = 1'b1;
-                ALUSrc = 1'b1;
+                ALUSrcA = 1'b1;
+                ALUSrcB = 1'b0;
                 MemRead = 1'b0;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;
@@ -111,9 +115,38 @@ module control_unit(
                 ALUOp = ALUOP_JALR;
             end
             
+            OPCODE_LUI: begin     // LUI instruction
+                RegWrite = 1'b1;
+                ALUSrcA = 1'b1;     // ALU will do 0 + imm
+                ALUSrcB = 1'b0;
+                MemRead = 1'b0;
+                MemWrite = 1'b0;
+                MemtoReg = 1'b0;
+                Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
+                ALUOp = ALUOP_LUI;
+            end
+            
+            OPCODE_AUIPC: begin     // LUI instruction
+                RegWrite = 1'b1;
+                ALUSrcA = 1'b1;
+                ALUSrcB = 1'b1;
+                MemRead = 1'b0;
+                MemWrite = 1'b0;
+                MemtoReg = 1'b0;
+                Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
+                ALUOp = ALUOP_ADD;
+            end
+            
             default: begin          // default case (invalid opcode)
                 RegWrite = 1'b0;
-                ALUSrc = 1'b0;
+                ALUSrcA = 1'b0;
+                ALUSrcB = 1'b0;
                 MemRead = 1'b0;
                 MemWrite = 1'b0;
                 MemtoReg = 1'b0;

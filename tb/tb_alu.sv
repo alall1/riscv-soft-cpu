@@ -105,6 +105,11 @@ module tb_alu;
         #10;
         if (branch_cond !== 1'b1) $error("BGEU op error. branch_cond=%b expected=%b", branch_cond, 1'b1);
         
+        ALUctrl = ALU_LUI;
+        input_2 = 32'hFFFF0000;
+        #10;
+        if (result !== 32'hFFFF0000) $error("LUI op error. result=%b expected=%b", result, 32'hFFFF0000);
+        
         $display("alu testbench finished");
         $finish;
     end

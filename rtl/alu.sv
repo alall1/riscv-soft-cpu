@@ -29,6 +29,7 @@ module alu(
             ALU_BGE: branch_cond = ($signed(input_1) >= $signed(input_2));
             ALU_BLTU: branch_cond = (input_1 < input_2);
             ALU_BGEU: branch_cond = (input_1 >= input_2);
+            ALU_LUI: result = input_2;
             
             default begin
                 result = 32'h00000000;

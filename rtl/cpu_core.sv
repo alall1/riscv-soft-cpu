@@ -20,7 +20,8 @@ module cpu_core(
     logic [31:0] memtoreg_result;           // result from memtoreg mux
     logic [31:0] write_result;              // result to write to reg_file (through jumpwrite mux)
     logic [31:0] imm;                       // generated immediate from imm_generator
-    logic [31:0] alu_src_input;             // selected input_2 into ALU (imm or rs2)
+    logic [31:0] alu_input_2;           // selected input_2 into ALU (imm or rs2)
+    logic [31:0] alu_input_1;           // selected input_1 into ALU (PC or rs1)
     logic [31:0] alu_result;                // result from ALU
     logic branch_cond;                      // branch_cond result from ALU
     
@@ -34,7 +35,8 @@ module cpu_core(
     
     // control signals
     logic RegWrite;
-    logic ALUSrc;
+    logic ALUSrcA;
+    logic ALUSrcB;
     logic MemRead;
     logic MemWrite;
     logic MemtoReg;
@@ -89,7 +91,8 @@ module cpu_core(
     control_unit c_unit (
         .opcode(instr[6:0]),
         .RegWrite(RegWrite),
-        .ALUSrc(ALUSrc),
+        .ALUSrcA(ALUSrcA),
+        .ALUSrcB(ALUSrcB),
         .MemRead(MemRead),
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
@@ -127,19 +130,27 @@ module cpu_core(
         .imm(imm)
     );
     
-    // ALUSrc mux
-    mux32 alu_src_mux (
+    // ALUSrcB mux (chooses between rs1 and PC)
+    mux32 alu_src_B_mux (
+        .A(rs1),
+        .B(pc_current),
+        .sel(ALUSrcB),
+        .result(alu_input_1)
+    );
+    
+    // ALUSrcA mux (chooses between rs2 and imm)
+    mux32 alu_src_A_mux (
         .A(rs2),
         .B(imm),
-        .sel(ALUSrc),
-        .result(alu_src_input)
+        .sel(ALUSrcA),
+        .result(alu_input_2)
     );
     
     // ALU
     alu alu_unit (
         .ALUctrl(ALUctrl),
-        .input_1(rs1),
-        .input_2(alu_src_input),
+        .input_1(alu_input_1),
+        .input_2(alu_input_2),
         .result(alu_result),
         .branch_cond(branch_cond)
     );
