@@ -1,15 +1,17 @@
 import cpu_defs_pkg::*;
 
-module cpu_core(
+module cpu_core #(
+    parameter string PROGRAM_FILE = "program_file.mem"
+)(
     input logic clk,
     input logic reset,
     
     output logic [31:0] debug_instr,
     output logic [31:0] debug_alu,
-    output logic [31:0] debug_imm,
     output logic [31:0] debug_writeback,
-    output logic [31:0] debug_pc_curr,
-    output logic [31:0] debug_pc_next
+    output logic [31:0] debug_pc,
+    output logic [4:0] debug_rd,
+    output logic debug_halt
 );
 
     logic [31:0] pc_current, pc_next;       // current pc and next pc
@@ -20,17 +22,17 @@ module cpu_core(
     logic [31:0] memtoreg_result;           // result from memtoreg mux
     logic [31:0] write_result;              // result to write to reg_file (through jumpwrite mux)
     logic [31:0] imm;                       // generated immediate from imm_generator
-    logic [31:0] alu_input_2;           // selected input_2 into ALU (imm or rs2)
-    logic [31:0] alu_input_1;           // selected input_1 into ALU (PC or rs1)
+    logic [31:0] alu_input_2;               // selected input_2 into ALU (imm or rs2)
+    logic [31:0] alu_input_1;               // selected input_1 into ALU (PC or rs1)
     logic [31:0] alu_result;                // result from ALU
     logic branch_cond;                      // branch_cond result from ALU
     
     assign debug_instr = instr;
     assign debug_alu = alu_result;
-    assign debug_imm = imm;
     assign debug_writeback = write_result;
-    assign debug_pc_curr = pc_current;
-    assign debug_pc_next = pc_next;
+    assign debug_pc = pc_current;
+    assign debug_rd = instr[11:7];
+    assign debug_halt = (instr == 32'h00100073);    // stop simulation @ ebreak
     
     
     // control signals
