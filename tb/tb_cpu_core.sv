@@ -9,26 +9,26 @@ module tb_cpu_core;
     logic [31:0] debug_instr;
     logic [31:0] debug_alu;
     logic [31:0] debug_writeback;
-    logic [31:0] debug_pc_curr;
+    logic [31:0] debug_pc;
     logic [4:0] debug_rd;
     logic debug_halt;
 
     cpu_core #(
-        .PROGRAM_FILE(".mem")
+        .PROGRAM_FILE("itype_test.mem")
     ) dut (
         .clk(clk),
         .reset(reset),
         .debug_instr(debug_instr),
         .debug_alu(debug_alu),
         .debug_writeback(debug_writeback),
-        .debug_pc_curr(debug_pc_curr),
+        .debug_pc(debug_pc),
         .debug_rd(debug_rd),
         .debug_halt(debug_halt)
     );
     
     initial begin
         clk = 1'b0;
-        forever #10 clk = ~clk;
+        forever #5 clk = ~clk;
     end
     
     logic trace_enable;
@@ -75,7 +75,9 @@ module tb_cpu_core;
         trace_enable = 1'b0;
         run_program(100, 1'b1);
         
-        check_mem(0, 32'h00000000);
+        check_mem(0, 32'hfffffff8);
+        check_mem(1, 32'h00000001);
+        check_mem(2, 32'h00000001);
         
         $display("PASS");
         $finish;
@@ -83,9 +85,9 @@ module tb_cpu_core;
     
     always @(posedge clk) begin
         #1;
-        if (!reset && trace_enable) begin
+        if (trace_enable) begin
             $display("PC=%h INSTR=%h RD=%0d WB=%h",
-                 debug_pc_curr,
+                 debug_pc,
                  debug_instr,
                  debug_rd,
                  debug_writeback);

@@ -84,7 +84,9 @@ module cpu_core #(
     );
     
     // instruction memory
-    instr_memory instr_mem (
+    instr_memory #(
+        .PROGRAM_FILE(PROGRAM_FILE)
+    ) instr_mem (
         .addr(pc_current),
         .instr(instr)
     );

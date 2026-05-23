@@ -15,6 +15,14 @@ module alu_control(
                 case ({funct7, funct3})
                     {7'b0000000, 3'b000}: ALUctrl = ALU_ADD;
                     {7'b0100000, 3'b000}: ALUctrl = ALU_SUB;
+                    {7'b0000000, 3'b100}: ALUctrl = ALU_XOR;
+                    {7'b0000000, 3'b110}: ALUctrl = ALU_OR;
+                    {7'b0000000, 3'b111}: ALUctrl = ALU_AND;
+                    {7'b0000000, 3'b001}: ALUctrl = ALU_SLL;
+                    {7'b0000000, 3'b101}: ALUctrl = ALU_SRL;
+                    {7'b0100000, 3'b101}: ALUctrl = ALU_SRA;
+                    {7'b0000000, 3'b010}: ALUctrl = ALU_SLT;
+                    {7'b0000000, 3'b011}: ALUctrl = ALU_SLTU;
                     default: ALUctrl = ALU_ADD;
                 endcase
             end
@@ -22,6 +30,21 @@ module alu_control(
             ALUOP_ITYPE: begin  // I-type ops (not loads)
                 case (funct3)
                     3'b000: ALUctrl = ALU_ADD;
+                    3'b100: ALUctrl = ALU_XOR;
+                    3'b110: ALUctrl = ALU_OR;
+                    3'b111: ALUctrl = ALU_AND;
+                    3'b001: begin
+                        if (funct7 == 7'b0000000) ALUctrl = ALU_SLL;
+                        else ALUctrl = ALU_ADD;
+                    end
+                    3'b101: begin
+                        if (funct7 == 7'b0000000) ALUctrl = ALU_SRL;
+                        else if (funct7 == 7'b0100000) ALUctrl = ALU_SRA;
+                        else ALUctrl = ALU_ADD;
+                    end
+                    3'b010: ALUctrl = ALU_SLT;
+                    3'b011: ALUctrl = ALU_SLTU;
+                    
                     default: ALUctrl = ALU_ADD;
                 endcase
             end
