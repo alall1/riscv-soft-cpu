@@ -49,6 +49,8 @@ module cpu_core #(
     alu_op_t ALUOp;
     alu_ctrl_t ALUctrl;
     
+    mem_op_t MemOp;
+    
     // program counter
     pc program_counter (
         .clk(clk),
@@ -158,6 +160,8 @@ module cpu_core #(
         .result(alu_result),
         .branch_cond(branch_cond)
     );
+    
+    assign MemOp = mem_op_t'(instr[14:12]);
     
     // data memory
     data_memory data_mem (

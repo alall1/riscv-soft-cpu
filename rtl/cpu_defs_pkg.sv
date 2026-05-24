@@ -41,5 +41,13 @@ package cpu_defs_pkg;
         ALU_BGEU   = 5'b01111,
         ALU_LUI    = 5'b10000
     } alu_ctrl_t;
+    
+    typedef enum logic [2:0] {  // MemOp encodings (derived from funct3)
+        MEM_BYTE    = 3'b000,
+        MEM_HALF    = 3'b001,
+        MEM_WORD    = 3'b010,
+        MEM_BYTE_U  = 3'b100,
+        MEM_HALF_U  = 3'b101
+    } mem_op_t;
 
 endpackage
