@@ -14,7 +14,7 @@ module tb_cpu_core;
     logic debug_halt;
 
     cpu_core #(
-        .PROGRAM_FILE("itype_test.mem")
+        .PROGRAM_FILE("loadstore_test.mem")
     ) dut (
         .clk(clk),
         .reset(reset),
@@ -89,12 +89,8 @@ module tb_cpu_core;
         trace_enable = 1'b0;
         run_program(100, 1'b1);
         
-        check_mem_byte(1, 8'hff);
-        check_mem_byte(5, 8'h00);
-        
-        check_mem_word(0, 32'hfffffff8);
-        check_mem_word(4, 32'h00000001);
-        check_mem_word(8, 32'h00000001);
+        check_mem_word(0, 32'h0000FD0F);      
+        check_mem_word(4, 32'h000100F7);
         
         $display("PASS");
         $finish;
