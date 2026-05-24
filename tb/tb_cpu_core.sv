@@ -14,7 +14,7 @@ module tb_cpu_core;
     logic debug_halt;
 
     cpu_core #(
-        .PROGRAM_FILE("utype_test.mem")
+        .PROGRAM_FILE("checksum_test.mem")
     ) dut (
         .clk(clk),
         .reset(reset),
@@ -89,9 +89,10 @@ module tb_cpu_core;
         trace_enable = 1'b0;
         run_program(100, 1'b1);
         
-        check_mem_word(0, 32'h12345000);
-        check_mem_word(4, 32'h12345004); 
-        
+        check_mem_word(124, 32'h00000003);  // count
+        check_mem_word(128, 32'hffffff82);  // checksum
+        check_mem_word(132, 32'h00000003);  // copied count
+
         $display("PASS");
         $finish;
     end
