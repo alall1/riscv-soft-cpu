@@ -14,7 +14,7 @@ module tb_cpu_core;
     logic debug_halt;
 
     cpu_core #(
-        .PROGRAM_FILE("branch_test.mem")
+        .PROGRAM_FILE("jump_test.mem")
     ) dut (
         .clk(clk),
         .reset(reset),
@@ -89,7 +89,8 @@ module tb_cpu_core;
         trace_enable = 1'b0;
         run_program(100, 1'b1);
         
-        check_mem_word(0, 32'h00000001);      
+        check_mem_word(0, 32'h00000003);
+        check_mem_word(4, 32'h00000000); 
         
         $display("PASS");
         $finish;
