@@ -60,13 +60,27 @@ module tb_cpu_core;
         end
     endtask
     
-    task check_mem;
-        input int word_addr;
-        input logic [31:0] expected;
+    task check_mem_byte;
+        input int byte_addr;
+        input logic [7:0] expected;
         
         begin
-            if (dut.data_mem.mem[word_addr] !== expected) begin
-                $fatal("FAIL: mem[%0d]=%h expected=%h", word_addr, dut.data_mem.mem[word_addr], expected);
+            if (dut.data_mem.mem[byte_addr] !== expected) begin
+                $fatal("FAIL: mem[%0d]=%h expected=%h", byte_addr, dut.data_mem.mem[byte_addr], expected);
+            end
+        end
+    endtask
+    
+    task check_mem_word;    // addresses should be in multiples of 4 for check_mem_word
+        input int byte_addr;
+        input logic [31:0] expected;
+        
+        logic [31:0] word;
+        
+        begin
+            assign word = {dut.data_mem.mem[byte_addr+3], dut.data_mem.mem[byte_addr+2], dut.data_mem.mem[byte_addr+1], dut.data_mem.mem[byte_addr]};
+            if (word !== expected) begin
+                $fatal("FAIL: mem[%0d]=%h expected=%h", byte_addr, word, expected);
             end
         end
     endtask
@@ -75,9 +89,12 @@ module tb_cpu_core;
         trace_enable = 1'b0;
         run_program(100, 1'b1);
         
-        check_mem(0, 32'hfffffff8);
-        check_mem(1, 32'h00000001);
-        check_mem(2, 32'h00000001);
+        check_mem_byte(1, 8'hff);
+        check_mem_byte(5, 8'h00);
+        
+        check_mem_word(0, 32'hfffffff8);
+        check_mem_word(4, 32'h00000001);
+        check_mem_word(8, 32'h00000001);
         
         $display("PASS");
         $finish;

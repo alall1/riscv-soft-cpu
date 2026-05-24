@@ -168,6 +168,7 @@ module cpu_core #(
         .clk(clk),
         .MemRead(MemRead),
         .MemWrite(MemWrite),
+        .MemOp(MemOp),
         .addr(alu_result),
         .write_data(rs2),
         .read_data(data_result)
