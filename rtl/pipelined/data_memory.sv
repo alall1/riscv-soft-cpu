@@ -15,7 +15,7 @@ module data_memory #(
     logic [7:0] mem [0:(4*DEPTH)-1];   // byte-addressed, DEPTH*4 because DEPTH is 
     
     initial begin
-        for (int i = 0; i < DEPTH; i++) begin
+        for (int i = 0; i < 4*DEPTH; i++) begin
             mem[i] = 8'h00;  // initialize all memory to 0
         end
     end
@@ -43,6 +43,7 @@ module data_memory #(
     end
 
     always_comb begin
+        read_data = 32'h00000000;
         if (MemRead) begin
             case (MemOp)
                 MEM_BYTE: begin

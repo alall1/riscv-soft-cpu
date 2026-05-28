@@ -9,7 +9,8 @@ module if_stage #(
     
     output logic [31:0] if_instr,
     output logic [31:0] if_pc,
-    output logic [31:0] if_pc_plus_4
+    output logic [31:0] if_pc_plus_4,
+    output logic if_is_ebreak
 );
 
     logic [31:0] pc;
@@ -44,6 +45,6 @@ module if_stage #(
     );
     
     assign if_pc = pc;
-    assign if_pc_plus_4 = pc_plus_4;
+    assign if_is_ebreak = (if_instr == 32'h00100073) ? 1'b1 : 1'b0;
 
 endmodule

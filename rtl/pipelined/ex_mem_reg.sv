@@ -6,11 +6,13 @@ module ex_mem_reg (
     input logic [31:0] ex_store_data,
     input logic [31:0] ex_pc_plus_4,
     input logic [4:0] ex_rd_addr,
+    input logic ex_is_ebreak,
     
     output logic [31:0] mem_alu_result,
     output logic [31:0] mem_store_data,
     output logic [31:0] mem_pc_plus_4,
     output logic [4:0] mem_rd_addr,
+    output logic mem_is_ebreak,
     
     // control signals
     input logic ex_RegWrite,
@@ -34,6 +36,7 @@ module ex_mem_reg (
             mem_store_data <= 32'h00000000;
             mem_pc_plus_4 <= 32'h00000000;
             mem_rd_addr <= 5'b00000;
+            mem_is_ebreak <= 1'b0;
             
             // control signals
             mem_RegWrite <= 1'b0;
@@ -47,6 +50,7 @@ module ex_mem_reg (
             mem_store_data <= ex_store_data;
             mem_pc_plus_4 <= ex_pc_plus_4;
             mem_rd_addr <= ex_rd_addr;
+            mem_is_ebreak <= ex_is_ebreak;
             
             // control signals
             mem_RegWrite <= ex_RegWrite;

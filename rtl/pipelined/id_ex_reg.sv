@@ -10,6 +10,7 @@ module id_ex_reg (
     input logic [31:0] id_imm,
     input logic [31:0] id_pc,
     input logic [31:0] id_pc_plus_4,
+    input logic id_is_ebreak,
     
     output logic [31:0] ex_rs1_data,
     output logic [31:0] ex_rs2_data,
@@ -17,6 +18,7 @@ module id_ex_reg (
     output logic [31:0] ex_imm,
     output logic [31:0] ex_pc,
     output logic [31:0] ex_pc_plus_4,
+    output logic ex_is_ebreak,
     
     // control signals
     input logic id_RegWrite,
@@ -54,6 +56,7 @@ module id_ex_reg (
             ex_imm <= 32'h00000000;
             ex_pc <= 32'h00000000;
             ex_pc_plus_4 <= 32'h00000000;
+            ex_is_ebreak <= 1'b0;
             
             // control signals
             ex_RegWrite <= 1'b0;
@@ -75,6 +78,7 @@ module id_ex_reg (
             ex_imm <= id_imm;
             ex_pc <= id_pc;
             ex_pc_plus_4 <= id_pc_plus_4;
+            ex_is_ebreak <= id_is_ebreak;
             
             // control signals
             ex_RegWrite <= id_RegWrite;

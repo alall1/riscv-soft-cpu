@@ -143,6 +143,20 @@ module control_unit(
                 ALUOp = ALUOP_ADD;
             end
             
+            OPCODE_EBREAK: begin    // ebreak
+                RegWrite = 1'b0;
+                ALUSrcA = 1'b0;
+                ALUSrcB = 1'b0;
+                MemRead = 1'b0;
+                MemWrite = 1'b0;
+                MemtoReg = 1'b0;
+                Branch = 1'b0;
+                JAL = 1'b0;
+                JALR = 1'b0;
+                JumpWrite = 1'b0;
+                ALUOp = ALUOP_ADD;
+            end
+            
             default: begin          // default case (invalid opcode)
                 RegWrite = 1'b0;
                 ALUSrcA = 1'b0;

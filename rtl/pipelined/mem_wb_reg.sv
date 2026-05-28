@@ -6,11 +6,13 @@ module mem_wb_reg (
     input logic [31:0] mem_read_data,
     input logic [31:0] mem_pc_plus_4,
     input logic [4:0] mem_rd_addr,
+    input logic mem_is_ebreak,
     
     output logic [31:0] wb_alu_result,
     output logic [31:0] wb_read_data,
     output logic [31:0] wb_pc_plus_4,
     output logic [4:0] wb_rd_addr,
+    output logic wb_is_ebreak,
     
     // control signals
     input logic mem_RegWrite,
@@ -28,6 +30,7 @@ module mem_wb_reg (
             wb_read_data <= 32'h00000000;
             wb_pc_plus_4 <= 32'h00000000;
             wb_rd_addr <= 5'b00000;
+            wb_is_ebreak <= 1'b0;
             
             // control signals
             wb_RegWrite <= 1'b0;
@@ -38,6 +41,7 @@ module mem_wb_reg (
             wb_read_data <= mem_read_data;
             wb_pc_plus_4 <= mem_pc_plus_4;
             wb_rd_addr <= mem_rd_addr;
+            wb_is_ebreak <= mem_is_ebreak;
             
             // control signals
             wb_RegWrite <= mem_RegWrite;

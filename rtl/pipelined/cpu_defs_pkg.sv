@@ -10,6 +10,7 @@ package cpu_defs_pkg;
     localparam logic [6:0] OPCODE_JALR = 7'b1100111;
     localparam logic [6:0] OPCODE_LUI = 7'b0110111;
     localparam logic [6:0] OPCODE_AUIPC = 7'b0010111;
+    localparam logic [6:0] OPCODE_EBREAK = 7'b1110011;
 
     typedef enum logic [2:0] {  // ALUOp encodings
         ALUOP_ADD    = 3'b000,

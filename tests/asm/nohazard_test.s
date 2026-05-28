@@ -1,0 +1,22 @@
+main:
+    addi x1, x0, 5
+    addi x2, x0, 10
+    addi x3, x0, -3
+    lui x4, 74565
+    addi x5, x0, 1
+    addi x6, x0, 31
+    addi x7, x0, 255
+    addi x8, x0, 64
+
+    add x9, x1, x2
+    sub x10, x2, x3
+    xor x11, x2, x7
+    sll x12, x5, x2
+    sra x13, x3, x5
+    slt x14, x3, x1
+
+    sw x9, 0(x8)
+    sw x10, 4(x8)
+    sw x11, 8(x8)
+
+    ebreak
