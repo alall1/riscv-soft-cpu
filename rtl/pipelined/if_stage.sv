@@ -46,5 +46,6 @@ module if_stage #(
     
     assign if_pc = pc;
     assign if_is_ebreak = (if_instr == 32'h00100073) ? 1'b1 : 1'b0;
+    assign if_pc_plus_4 = pc_plus_4;
 
 endmodule

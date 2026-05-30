@@ -10,6 +10,10 @@ module cpu_core #(
     output logic debug_halt
 );
 
+    // hazard unit signals
+    logic if_id_flush;
+    logic id_ex_flush;
+
     // IF stage input signals
     logic [31:0] ex_redirect_target;
     logic ex_redirect_taken;
@@ -42,10 +46,14 @@ module cpu_core #(
     if_id_reg if_id_register (
         .clk(clk),
         .reset(reset),
+        
+        .if_id_flush(if_id_flush),
+        
         .if_instr(if_instr),
         .if_pc(if_pc),
         .if_pc_plus_4(if_pc_plus_4),
         .if_is_ebreak(if_is_ebreak),
+        
         .id_instr(id_instr),
         .id_pc(id_pc),
         .id_pc_plus_4(id_pc_plus_4),
@@ -126,6 +134,8 @@ module cpu_core #(
     id_ex_reg id_ex_register (
         .clk(clk),
         .reset(reset),
+        
+        .id_ex_flush(id_ex_flush),
     
         .id_rs1_data(id_rs1_data),
         .id_rs2_data(id_rs2_data),
@@ -288,6 +298,12 @@ module cpu_core #(
         .MemtoReg(wb_MemtoReg),
         .JumpWrite(wb_JumpWrite),
         .write_data(wb_write_data)
+    );   
+    
+    hazard_unit h_unit (
+        .redirect_taken(ex_redirect_taken),
+        .if_id_flush(if_id_flush),
+        .id_ex_flush(id_ex_flush)
     );
     
     assign debug_halt = wb_is_ebreak;

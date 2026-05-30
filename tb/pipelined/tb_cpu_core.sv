@@ -9,7 +9,7 @@ module tb_cpu_core;
     logic debug_halt;
 
     cpu_core #(
-        .PROGRAM_FILE("nohazard_test.mem")
+        .PROGRAM_FILE("ctrlhazard_test.mem")
     ) dut (
         .clk(clk),
         .reset(reset),
@@ -39,7 +39,6 @@ module tb_cpu_core;
             
             while (!debug_halt && cycles < max_cycles) begin
                 @(posedge clk);
-                if (trace_enable) $display("cycle %0d", cycles);
                 cycles++;
             end
             
@@ -48,6 +47,7 @@ module tb_cpu_core;
             if (cycles >= max_cycles) begin
                 $fatal("FAIL: timeout");
             end
+            $display("%0d cycles taken", cycles);
         end
     endtask
     
@@ -80,9 +80,9 @@ module tb_cpu_core;
         trace_enable = 1'b0;
         run_program(100, 1'b1);
         
-        check_mem_word(64, 32'h0000000f);
-        check_mem_word(68, 32'h0000000d);
-        check_mem_word(72, 32'h000000f5);
+        check_mem_word(64, 32'h0000000d);
+        check_mem_word(68, 32'h00000017);
+        check_mem_word(72, 32'h0000002a);
 
         $display("PASS");
         $finish;

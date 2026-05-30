@@ -4,6 +4,8 @@ module id_ex_reg (
     input logic clk,
     input logic reset,
     
+    input logic id_ex_flush,
+    
     input logic [31:0] id_rs1_data,
     input logic [31:0] id_rs2_data,
     input logic [4:0] id_rd_addr,
@@ -50,6 +52,28 @@ module id_ex_reg (
 
     always_ff @(posedge clk) begin
         if (reset) begin
+            ex_rs1_data <= 32'h00000000;
+            ex_rs2_data <= 32'h00000000;
+            ex_rd_addr <= 5'b00000;
+            ex_imm <= 32'h00000000;
+            ex_pc <= 32'h00000000;
+            ex_pc_plus_4 <= 32'h00000000;
+            ex_is_ebreak <= 1'b0;
+            
+            // control signals
+            ex_RegWrite <= 1'b0;
+            ex_ALUSrcA <= 1'b0;
+            ex_ALUSrcB <= 1'b0;
+            ex_MemRead <= 1'b0;
+            ex_MemWrite <= 1'b0;
+            ex_MemtoReg <= 1'b0;
+            ex_Branch <= 1'b0;
+            ex_JAL <= 1'b0;
+            ex_JALR <= 1'b0;
+            ex_JumpWrite <= 1'b0;
+            ex_ALUctrl <= ALU_ADD;
+            ex_MemOp <= MEM_WORD;
+        end else if (id_ex_flush) begin
             ex_rs1_data <= 32'h00000000;
             ex_rs2_data <= 32'h00000000;
             ex_rd_addr <= 5'b00000;
