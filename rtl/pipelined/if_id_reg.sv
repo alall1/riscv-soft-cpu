@@ -3,6 +3,7 @@ module if_id_reg (
     input logic reset,
     
     input logic if_id_flush,
+    input logic if_id_stall,
     
     input logic [31:0] if_instr,
     input logic [31:0] if_pc,
@@ -26,7 +27,7 @@ module if_id_reg (
             id_pc <= 32'h00000000;
             id_pc_plus_4 <= 32'h00000000;
             id_is_ebreak <= 1'b0;
-        end else begin
+        end else if (~if_id_stall) begin
             id_instr <= if_instr;
             id_pc <= if_pc;
             id_pc_plus_4 <= if_pc_plus_4;

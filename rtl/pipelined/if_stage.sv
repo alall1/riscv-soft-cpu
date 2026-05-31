@@ -4,6 +4,8 @@ module if_stage #(
     input logic clk,
     input logic reset,
     
+    input logic pc_stall,
+    
     input logic [31:0] redirect_target,
     input logic redirect_taken,
     
@@ -20,6 +22,7 @@ module if_stage #(
     pc prog_counter (
         .clk(clk),
         .reset(reset),
+        .pc_stall(pc_stall),
         .pc_next(pc_next),
         .pc(pc)
     );
