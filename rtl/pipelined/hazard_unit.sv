@@ -21,50 +21,37 @@ module hazard_unit(
     output logic pc_stall,
     output logic if_id_stall
 );
-    
+
+    logic rs1_hazard;
+    logic rs2_hazard;
+    logic raw_stall;
+
     always_comb begin
-        if_id_flush = 1'b0;
-        id_ex_flush = 1'b0;
-        pc_stall = 1'b0;
-        if_id_stall = 1'b0;
-        
-        // control hazard logic (branches and jumps)
-        if (redirect_taken) begin
-            if_id_flush = 1'b1;
-            id_ex_flush = 1'b1;
+        rs1_hazard = 1'b0;
+        rs2_hazard = 1'b0;
+        raw_stall  = 1'b0;
+
+        if (id_uses_rs1 && (id_rs1_addr != 5'd0)) begin
+            rs1_hazard =
+                (id_ex_RegWrite  && (id_rs1_addr == id_ex_rd_addr))  ||
+                (ex_mem_RegWrite && (id_rs1_addr == ex_mem_rd_addr)) ||
+                (mem_wb_RegWrite && (id_rs1_addr == mem_wb_rd_addr));
         end
-        
-        // RAW hazard logic (read after write)
-        if ((id_rs1_addr != 5'b0) && id_uses_rs1) begin
-            if ((id_rs1_addr == id_ex_rd_addr) && id_ex_RegWrite) begin
-                pc_stall = 1'b1;
-                if_id_stall = 1'b1;
-                id_ex_flush = 1'b1;
-            end else if ((id_rs1_addr == ex_mem_rd_addr) && ex_mem_RegWrite) begin
-                pc_stall = 1'b1;
-                if_id_stall = 1'b1;
-                id_ex_flush = 1'b1;
-            end else if ((id_rs1_addr == mem_wb_rd_addr) && mem_wb_RegWrite) begin
-                pc_stall = 1'b1;
-                if_id_stall = 1'b1;
-                id_ex_flush = 1'b1;
-            end
+
+        if (id_uses_rs2 && (id_rs2_addr != 5'd0)) begin
+            rs2_hazard =
+                (id_ex_RegWrite  && (id_rs2_addr == id_ex_rd_addr))  ||
+                (ex_mem_RegWrite && (id_rs2_addr == ex_mem_rd_addr)) ||
+                (mem_wb_RegWrite && (id_rs2_addr == mem_wb_rd_addr));
         end
-        if ((id_rs2_addr != 5'b0) && id_uses_rs2) begin
-            if ((id_rs2_addr == id_ex_rd_addr) && id_ex_RegWrite) begin
-                pc_stall = 1'b1;
-                if_id_stall = 1'b1;
-                id_ex_flush = 1'b1;
-            end else if ((id_rs2_addr == ex_mem_rd_addr) && ex_mem_RegWrite) begin
-                pc_stall = 1'b1;
-                if_id_stall = 1'b1;
-                id_ex_flush = 1'b1;
-            end else if ((id_rs2_addr == mem_wb_rd_addr) && mem_wb_RegWrite) begin
-                pc_stall = 1'b1;
-                if_id_stall = 1'b1;
-                id_ex_flush = 1'b1;
-            end
-        end
+
+        raw_stall = rs1_hazard || rs2_hazard;
+
+        pc_stall    = raw_stall && ~redirect_taken;
+        if_id_stall = raw_stall && ~redirect_taken;
+
+        if_id_flush = redirect_taken;
+        id_ex_flush = redirect_taken || raw_stall;
     end
 
 endmodule

@@ -9,7 +9,7 @@ module tb_cpu_core;
     logic debug_halt;
 
     cpu_core #(
-        .PROGRAM_FILE("ctrlhazard_test.mem")
+        .PROGRAM_FILE("rawhazard_test.mem")
     ) dut (
         .clk(clk),
         .reset(reset),
@@ -21,15 +21,11 @@ module tb_cpu_core;
         forever #5 clk = ~clk;
     end
     
-    logic trace_enable;
-    
     task run_program;
         input int max_cycles;
-        input bit enable_trace;
         int cycles;
         
         begin
-            trace_enable = enable_trace;
             
             reset = 1'b1;
             repeat (2) @(posedge clk);
@@ -41,8 +37,6 @@ module tb_cpu_core;
                 @(posedge clk);
                 cycles++;
             end
-            
-            trace_enable = 1'b0;
             
             if (cycles >= max_cycles) begin
                 $fatal("FAIL: timeout");
@@ -77,12 +71,9 @@ module tb_cpu_core;
     endtask
 
     initial begin
-        trace_enable = 1'b0;
-        run_program(100, 1'b1);
+        run_program(100);
         
-        check_mem_word(64, 32'h0000000d);
-        check_mem_word(68, 32'h00000017);
-        check_mem_word(72, 32'h0000002a);
+        check_mem_word(64, 32'h00000008);
 
         $display("PASS");
         $finish;

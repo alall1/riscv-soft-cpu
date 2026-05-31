@@ -9,6 +9,11 @@ module id_stage(
     input logic [4:0] wb_rd_addr,       // coming from WB stage
     input logic wb_RegWrite,            // coming from WB stage
     
+    output logic [4:0] id_rs1_addr,
+    output logic [4:0] id_rs2_addr,
+    output logic id_uses_rs1,
+    output logic id_uses_rs2,
+    
     output logic [31:0] id_rs1_data,
     output logic [31:0] id_rs2_data,
     output logic [4:0] id_rd_addr,      // generated from current instr in ID
@@ -60,7 +65,10 @@ module id_stage(
         .JAL(id_JAL),
         .JALR(id_JALR),
         .JumpWrite(id_JumpWrite),
-        .ALUOp(ALUOp)
+        .ALUOp(ALUOp),
+        
+        .uses_rs1(id_uses_rs1),
+        .uses_rs2(id_uses_rs2)
     );
     
     alu_control alu_c_unit (
@@ -72,5 +80,7 @@ module id_stage(
 
     assign id_MemOp = mem_op_t'(instr[14:12]);
     assign id_rd_addr = instr[11:7];
+    assign id_rs1_addr = instr[19:15];
+    assign id_rs2_addr = instr[24:20];
     
 endmodule

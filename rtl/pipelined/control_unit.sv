@@ -12,7 +12,10 @@ module control_unit(
     output logic JAL,
     output logic JALR,
     output logic JumpWrite, // JumpWrite controls mux to select for writing PC + 4 to rd
-    output alu_op_t ALUOp
+    output alu_op_t ALUOp,
+    
+    output logic uses_rs1,
+    output logic uses_rs2
 );
 
     always_comb begin
@@ -29,6 +32,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_RTYPE;
+                
+                uses_rs1 = 1'b1;
+                uses_rs2 = 1'b1;
             end
             
             OPCODE_ITYPE: begin     // I-type instructions (not loads)
@@ -43,6 +49,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_ITYPE;
+                
+                uses_rs1 = 1'b1;
+                uses_rs2 = 1'b0;
             end
             
             OPCODE_LOADS: begin     // I-type instructions (loads)
@@ -57,6 +66,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_LOADS;
+                
+                uses_rs1 = 1'b1;
+                uses_rs2 = 1'b0;
             end
             
             OPCODE_STYPE: begin     // S-type instructions
@@ -71,6 +83,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_STYPE;
+                
+                uses_rs1 = 1'b1;
+                uses_rs2 = 1'b1;
             end
             
             OPCODE_BTYPE: begin     // B-type instructions
@@ -85,6 +100,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_BTYPE;
+                
+                uses_rs1 = 1'b1;
+                uses_rs2 = 1'b1;
             end
             
             OPCODE_JAL: begin     // JAL instructions
@@ -99,6 +117,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b1;
                 ALUOp = ALUOP_ADD;
+                
+                uses_rs1 = 1'b0;
+                uses_rs2 = 1'b0;
             end
             
             OPCODE_JALR: begin     // JALR instructions
@@ -113,6 +134,9 @@ module control_unit(
                 JALR = 1'b1;
                 JumpWrite = 1'b1;
                 ALUOp = ALUOP_JALR;
+                
+                uses_rs1 = 1'b1;
+                uses_rs2 = 1'b0;
             end
             
             OPCODE_LUI: begin     // LUI instruction
@@ -127,6 +151,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_LUI;
+                
+                uses_rs1 = 1'b0;
+                uses_rs2 = 1'b0;
             end
             
             OPCODE_AUIPC: begin     // AUIPC instruction
@@ -141,6 +168,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_ADD;
+                
+                uses_rs1 = 1'b0;
+                uses_rs2 = 1'b0;
             end
             
             OPCODE_EBREAK: begin    // ebreak
@@ -155,6 +185,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_ADD;
+                
+                uses_rs1 = 1'b0;
+                uses_rs2 = 1'b0;
             end
             
             default: begin          // default case (invalid opcode)
@@ -169,6 +202,9 @@ module control_unit(
                 JALR = 1'b0;
                 JumpWrite = 1'b0;
                 ALUOp = ALUOP_ADD;
+                
+                uses_rs1 = 1'b0;
+                uses_rs2 = 1'b0;
             end
         endcase
     end

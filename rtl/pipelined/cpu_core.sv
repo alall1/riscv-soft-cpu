@@ -13,6 +13,14 @@ module cpu_core #(
     // hazard unit signals
     logic if_id_flush;
     logic id_ex_flush;
+    
+    logic pc_stall;
+    logic if_id_stall;
+    
+    logic [4:0] id_rs1_addr;
+    logic [4:0] id_rs2_addr;
+    logic id_uses_rs1;
+    logic id_uses_rs2;
 
     // IF stage input signals
     logic [31:0] ex_redirect_target;
@@ -35,8 +43,12 @@ module cpu_core #(
     ) fetch (
         .clk(clk),
         .reset(reset),
+        
+        .pc_stall(pc_stall),
+        
         .redirect_target(ex_redirect_target),
         .redirect_taken(ex_redirect_taken),
+        
         .if_instr(if_instr),
         .if_pc(if_pc),
         .if_pc_plus_4(if_pc_plus_4),
@@ -48,6 +60,7 @@ module cpu_core #(
         .reset(reset),
         
         .if_id_flush(if_id_flush),
+        .if_id_stall(if_id_stall),
         
         .if_instr(if_instr),
         .if_pc(if_pc),
@@ -109,14 +122,22 @@ module cpu_core #(
     id_stage decode (
         .clk(clk),
         .reset(reset),
+        
         .instr(id_instr),
         .wb_write_data(wb_write_data),
         .wb_rd_addr(wb_rd_addr),
         .wb_RegWrite(wb_RegWrite),
+        
+        .id_rs1_addr(id_rs1_addr),
+        .id_rs2_addr(id_rs2_addr),
+        .id_uses_rs1(id_uses_rs1),
+        .id_uses_rs2(id_uses_rs2),
+        
         .id_rs1_data(id_rs1_data),
         .id_rs2_data(id_rs2_data),
         .id_rd_addr(id_rd_addr),
         .id_imm(id_imm),
+        
         .id_RegWrite(id_RegWrite),
         .id_ALUSrcA(id_ALUSrcA),
         .id_ALUSrcB(id_ALUSrcB),
@@ -302,8 +323,26 @@ module cpu_core #(
     
     hazard_unit h_unit (
         .redirect_taken(ex_redirect_taken),
+        
+        .id_rs1_addr(id_rs1_addr),
+        .id_rs2_addr(id_rs2_addr),
+        .id_uses_rs1(id_uses_rs1),
+        .id_uses_rs2(id_uses_rs2),
+        
+        .id_ex_rd_addr(ex_rd_addr),
+        .id_ex_RegWrite(ex_RegWrite),
+        
+        .ex_mem_rd_addr(mem_rd_addr),
+        .ex_mem_RegWrite(mem_RegWrite),
+        
+        .mem_wb_rd_addr(wb_rd_addr),
+        .mem_wb_RegWrite(wb_RegWrite),
+        
         .if_id_flush(if_id_flush),
-        .id_ex_flush(id_ex_flush)
+        .id_ex_flush(id_ex_flush),
+        
+        .pc_stall(pc_stall),
+        .if_id_stall(if_id_stall)
     );
     
     assign debug_halt = wb_is_ebreak;
