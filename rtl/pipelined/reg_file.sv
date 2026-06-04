@@ -24,8 +24,20 @@ module reg_file(
     end
     
     always_comb begin
-        rs1_data = registers[rs1_addr];
-        rs2_data = registers[rs2_addr];
+        if ((rs1_addr == rd_addr) && (RegWrite && rd_addr != 5'd0)) begin   // half-cycle WB bypass (comment these lines for non-half-cycle-WB version)
+            rs1_data = write_data;
+        end else begin
+            rs1_data = registers[rs1_addr];
+        end
+        
+        if ((rs2_addr == rd_addr) && (RegWrite && rd_addr != 5'd0)) begin
+            rs2_data = write_data;
+        end else begin
+            rs2_data = registers[rs2_addr];
+        end
+        
+        // rs1_data = registers[rs1_addr];  // uncomment these lines for non-half-cycle-WB version
+        // rs2_data = registers[rs2_addr];
     end
 
 endmodule

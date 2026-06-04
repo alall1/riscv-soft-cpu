@@ -33,16 +33,16 @@ module hazard_unit(
 
         if (id_uses_rs1 && (id_rs1_addr != 5'd0)) begin
             rs1_hazard =
-                (id_ex_RegWrite  && (id_rs1_addr == id_ex_rd_addr))  ||
-                (ex_mem_RegWrite && (id_rs1_addr == ex_mem_rd_addr)) ||
-                (mem_wb_RegWrite && (id_rs1_addr == mem_wb_rd_addr));
+                (id_ex_RegWrite  && (id_rs1_addr == id_ex_rd_addr))
+                || (ex_mem_RegWrite && (id_rs1_addr == ex_mem_rd_addr));
+//                || (mem_wb_RegWrite && (id_rs1_addr == mem_wb_rd_addr)); // uncomment this line and remove semicolon above to disable half-cycle-WB
         end
 
         if (id_uses_rs2 && (id_rs2_addr != 5'd0)) begin
             rs2_hazard =
-                (id_ex_RegWrite  && (id_rs2_addr == id_ex_rd_addr))  ||
-                (ex_mem_RegWrite && (id_rs2_addr == ex_mem_rd_addr)) ||
-                (mem_wb_RegWrite && (id_rs2_addr == mem_wb_rd_addr));
+                (id_ex_RegWrite  && (id_rs2_addr == id_ex_rd_addr))
+                || (ex_mem_RegWrite && (id_rs2_addr == ex_mem_rd_addr));
+//                || (mem_wb_RegWrite && (id_rs2_addr == mem_wb_rd_addr)); // uncomment this line and remove semicolon above to disable half-cycle-WB
         end
 
         raw_stall = rs1_hazard || rs2_hazard;
