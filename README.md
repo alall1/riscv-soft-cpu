@@ -53,7 +53,7 @@ The pipelined CPU was built after the single-cycle CPU so that the single-cycle 
 
 ## Single-Cycle CPU
 
-[INSERT SINGLE-CYCLE CPU DATAPATH DIAGRAM HERE]
+<img width="828" height="641" alt="single_cycle_datapath" src="https://github.com/user-attachments/assets/9a2c937d-8083-4d94-ac87-ae8d9345530f" />
 
 The single-cycle CPU executes one full instruction per clock cycle. In this design, the instruction fetch, decode, execute, memory, and writeback operations all occur within one long combinational path between clock edges.
 
@@ -108,7 +108,8 @@ The single-cycle design is simpler to reason about, but the clock period is limi
 
 ## Pipelined CPU
 
-[INSERT 5-STAGE PIPELINED CPU DIAGRAM HERE]
+<img width="651" height="307" alt="pipelined_datapath" src="https://github.com/user-attachments/assets/553abba3-86ca-40ef-897b-f5faa7cb762d" />
+
 
 The pipelined CPU divides instruction execution into five stages. Each stage performs part of the instruction, and pipeline registers hold values between stages. This allows multiple instructions to be active at the same time.
 
@@ -285,8 +286,6 @@ To handle this, the CPU uses a `hazard_unit`.
 ---
 
 ## Hazard Unit
-
-[INSERT HAZARD UNIT INPUT/OUTPUT DIAGRAM HERE]
 
 The hazard unit detects when the instruction in ID depends on an older instruction that has not written back yet.
 
